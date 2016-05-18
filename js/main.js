@@ -8,32 +8,62 @@ var interactor = (function() {
 
     var feedData = {};
 
-    function addToFeed(data){
+    function parseDataItem(data) {
         feedData[data.id] = data;
-
-        var cont = $("<li></li>");
-        var header = $("<h3></h3>");
-        var headLeft = $("<span></span>");
-        var headCenter = $("<span></span>");
-        var headRight = $("<span></span>");
-        
-        cont.attr('id', data.id);
-        cont.addClass('list-group-item post-container');
-
-        // handlebars.js - http://handlebarsjs.com/
-
-
-
-
-
-        $('#feed-container').append(div);
+        addToFeed(data);
     }
+
+    function addToFeed(data){
+
+        var post = $("<li/>", {
+            'class':'list-group-item post-container',
+            'id':data.id
+        });
+        var header  = $('<div/>',{ 'class':'post-header' });
+        var body    = $('<div/>',{ 'class':'post-body' });
+        var footer  = $('<div/>',{ 'class':'post-footer' });
+        
+        var avator  = $('<img/>', {
+            'class':'avator',
+            'src':data.actor_avator,
+            'alt':data.actor_username + ' avator'
+        });
+
+        var author  = $('<h3/>', {
+            'class': 'author',
+            'text': data.actor_name
+        });
+
+        var username = $('<small/>', {
+            'text': ' @'+data.actor_username //todo: should the @ always be there?
+        });
+
+        if(data.activity_attachment !== null && data.activity_attachment_type === 'image/jpeg') {
+            var bodyImg = $('<img/>', {
+                'class':'body-img',
+                'src':data.activity_message
+                //,'alt':'?'
+            });
+            $(body).append(bodyImg);
+        } else {
+            $(body).text(data.activity_message);
+        }
+
+
+        $(author).append(username);
+        $(header).append(avator, author);
+
+        $(post).append(header, body, footer);
+        $('#feed-container').append(post);
+    }
+
+    //function getFeedEl() {  }
 
     return {
         init: function() {
             var getReq = $.getJSON(remoteUrl, function(data){
                 if(data.length > 0) {
-                    data.forEach(addToFeed);
+                    data.forEach(parseDataItem);
                 } else { /* todo: no data received event? */ }
 
             })

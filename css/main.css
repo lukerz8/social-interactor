@@ -1,5 +1,43 @@
 html{ height: 100%; }
 body {
-    min-height: 100%;
+    height: 100%;
     background: #222;
+}
+
+#main-container,
+#main-container>.row{
+    height: 100%;
+}
+
+#main-container {
+
+}
+
+#feed-container {
+    border: 1px solid #ccc;
+    max-height:90%;
+    overflow-y:scroll;
+}
+#feed-container>.post-container>.post-body,
+#feed-container>.post-container .post-header {
+    border-bottom: 1px solid #ccc;
+}
+
+#feed-container>.post-container .post-header > * {
+    display:inline-block;
+
+}
+
+#feed-container>.post-container .post-header > .author {
+    text-align:left;
+}
+
+#feed-container>.post-container .post-header img.avator {
+    height: auto;
+    max-width: 64px;
+    margin-right: 15px;
+}
+
+#feed-container>.post-container>.post-body {
+    padding: 10px 15px;
 }
