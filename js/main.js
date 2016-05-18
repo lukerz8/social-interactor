@@ -1,45 +1,54 @@
 $(function(){
-
-    var data = interactor.getData();
-    /*
-    var retData = {};
-
-    $.getJSON(
-        'data/test-01.json',
-        function(data) {
-            retData = data;
-        });
-
-    console.log(retData);
-    */
-
-    //console.log(data);
-    //$('#main-container').text(data);
+    interactor.init();
 });
 
 var interactor = (function() {
+    //var remoteUrl = 'https://nuvi-challenge.herokuapp.com/activities';
+    var remoteUrl = 'data/test-01.json';
 
-    function getNuviData() {
-        //var remoteUrl = 'https://nuvi-challenge.herokuapp.com/activities';
-        var remoteUrl = 'data/test-01.json';
-        var ret = {};
-        $.getJSON(remoteUrl, function(data){
-            console.log(data);
-            ret = data;
-        });
+    var feedData = {};
 
-        return ret;
+    function addToFeed(data){
+        feedData[data.id] = data;
+
+        var cont = $("<li></li>");
+        var header = $("<h3></h3>");
+        var headLeft = $("<span></span>");
+        var headCenter = $("<span></span>");
+        var headRight = $("<span></span>");
+        
+        cont.attr('id', data.id);
+        cont.addClass('list-group-item post-container');
+
+        // handlebars.js - http://handlebarsjs.com/
+
+
+
+
+
+        $('#feed-container').append(div);
     }
 
     return {
-        getData: function() {
-            return getNuviData();
+        init: function() {
+            var getReq = $.getJSON(remoteUrl, function(data){
+                if(data.length > 0) {
+                    data.forEach(addToFeed);
+                } else { /* todo: no data received event? */ }
+
+            })
+              .done(function(){
+                  // todo?
+              })
+              .fail(function(){
+                  // todo?
+              });
+        },
+        getFeedData: function() {
+            return feedData; // todo: does this need to check to make sure the data has been retrieved first?
         }
     };
 
 
 })();
 
-
-
-// Link: <https://nuvi-challenge.herokuapp.com/activities>
