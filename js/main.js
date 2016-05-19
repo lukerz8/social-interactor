@@ -72,7 +72,8 @@ var interactor = (function() {
         if(data.activity_attachment !== null && data.activity_attachment_type === 'image/jpeg') {
             var bodyImgCont  = $('<a/>', {
                 'class': 'post-img-container',
-                'href': data.activity_attachment
+                'href': data.activity_attachment,
+                'target': '_blank'
             });
 
             var bodyImg = $('<img/>', {
@@ -95,7 +96,40 @@ var interactor = (function() {
 
         /******** Post Footer Elements ********/
 
-        // todo
+        // Thanks w3Schools for the tool"tip" <http://www.w3schools.com/css/css_tooltip.asp> ;D
+
+        var sentiment = $('<span/>', {
+            'class': 'activity-icon tooltip fa fa-' + getSentimentType(data.activity_sentiment),
+            'html': '<span class="material tooltiptext tooltip-bottom">Sentiment</span>'
+        });
+
+        var likes = $('<span/>', {
+            'class': 'activity-icon tooltip fa fa-thumbs-o-up',
+            'html': '&nbsp;' + data.activity_likes + 
+                '<span class="material tooltiptext tooltip-bottom">Likes</span>'
+        });
+
+        var shares = $('<span/>', {
+            'class': 'activity-icon tooltip fa fa-retweet',
+            'html': '&nbsp;' + data.activity_shares +
+                '<span class="material tooltiptext tooltip-bottom">Shares</span>'
+        });
+
+        var comments = $('<span/>', {
+            'class': 'activity-icon tooltip fa fa-comment-o',
+            'html': '&nbsp;' + data.activity_comments +
+            '<span class="material tooltiptext tooltip-bottom">Comments</span>'
+        });
+
+        var url = $('<a/>', {
+            'class': 'activity-icon tooltip fa fa-external-link',
+            'href': data.activity_url,
+            'target': '_blank',
+            'html': '<span class="material tooltiptext tooltip-bottom">View Post</span>'
+
+        });
+
+        $(postFooter).append(sentiment, likes, shares, comments, url);
 
         /** Combine and Append Post to Feed Container **/
 
@@ -112,6 +146,12 @@ var interactor = (function() {
             case 'twitter':     return 'twitter';       break;
             default:            return 'question';
         }
+    }
+
+    function getSentimentType(sentiment) {
+        if(sentiment < 0)       { return 'frown-o'; }
+        else if(sentiment > 0)  { return 'smile-o'; }
+        else                    { return 'meh-o'; }
     }
 
     // Could update this to prettier date later; keeping it simple for now

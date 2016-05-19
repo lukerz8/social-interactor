@@ -34,6 +34,44 @@ html, body {
 .post-header .fa-tumblr         { background-color: #45556c; }
 .post-header .fa-twitter        { background-color: #4da7de; }
 
+/* Thanks w3Schools for the tool"tip" <http://www.w3schools.com/css/css_tooltip.asp> ;D */
+.tooltip { position: relative; }
+
+.tooltip .tooltiptext {
+    font-family: 'Lato', sans-serif;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 15px;
+    position: absolute;
+    z-index: 1;
+    opacity: 0;
+    -webkit-transition:  opacity 400ms ease-in-out;
+    -moz-transition-property: opacity 400ms ease-in-out;
+    -o-transition-property: opacity 400ms ease-in-out;
+    transition: opacity 400ms ease-in-out;
+}
+
+.tooltip:hover .tooltiptext { opacity: 1; }
+
+.tooltip .tooltiptext.tooltip-bottom {
+    top: 100%;
+    left: 50%;
+    margin-left: -50px;
+}
+/*
+.tooltip .tooltiptext.tooltip-bottom::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent black transparent;
+}
+*/
+
 #main-container { height: 100%; }
 
 #feed-control { margin-top: 15px; }
@@ -128,10 +166,10 @@ html, body {
     -moz-border-radius: 2px;
     border-radius: 2px;
     overflow:hidden;
-    -webkit-transition:  border 200ms ease;
-    -moz-transition-property: border 200ms ease;
-    -o-transition-property: border 200ms ease;
-    transition: border 200ms ease;
+    -webkit-transition:  border 200ms ease-in-out;
+    -moz-transition-property: border 200ms ease-in-out;
+    -o-transition-property: border 200ms ease-in-out;
+    transition: border 200ms ease-in-out;
 }
 .post-container>.post-body>.post-img-container:hover,
 .post-container>.post-body>.post-img-container:active {
@@ -140,6 +178,21 @@ html, body {
 .post-img-container>.post-img { width: 100%; height: 100%; }
 
 
+.post-container>.post-footer {
+
+}
+
+.post-container>.post-footer .activity-icon {
+    width: 20%;
+    padding: 20px 0;
+    display: inline-block;
+    text-align: center;
+    text-decoration:none;
+}
+
+.post-container>.post-footer .activity-icon.fa-external-link { color:#000; }
+.post-container>.post-footer .activity-icon.fa-external-link:hover,
+.post-container>.post-footer .activity-icon.fa-external-link:active { color:#888; }
 
 
 
