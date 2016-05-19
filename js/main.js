@@ -3,7 +3,7 @@ $(function(){
 });
 
 var interactor = (function() {
-    //var remoteUrl = 'https://nuvi-challenge.herokuapp.com/activities';
+    //var remoteUrl = '//nuvi-challenge.herokuapp.com/activities';
     var remoteUrl = 'data/test-01.json';
 
     var feedData = {};
@@ -154,6 +154,19 @@ var interactor = (function() {
         else                    { return 'meh-o'; }
     }
 
+    // if the data source is down or no data is received...
+    function msgNoData(errMsg) {
+        if(errMsg.length == 0) { errMsg = "Unknown Error"; }
+
+        var post = $("<div/>", {
+            'class':'material post-container post-error',
+            'html':"<h3>No Data Received: " + errMsg + "</h3>"
+        });
+
+
+        $('#feed-container').append(post);
+    }
+
     // Could update this to prettier date later; keeping it simple for now
     function formatPostDate(dateStr) {
         var d = new Date(dateStr);
@@ -166,15 +179,13 @@ var interactor = (function() {
             $.getJSON(remoteUrl, function(data){
                 if(data.length > 0) {
                     data.forEach(parseDataItem);
-                } else { /* todo: no data received event? */ }
+                } else { msgNoData("There are no posts"); }
 
             })
               .done(function(){
                   // todo?
               })
-              .fail(function(){
-                  // todo?
-              });
+              .fail(function(){ msgNoData("Request Failed"); });
         },
         getFeedData: function() {
             return feedData; // todo: does this need to check to make sure the data has been retrieved first?

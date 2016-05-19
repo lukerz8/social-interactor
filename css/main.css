@@ -91,6 +91,8 @@ html, body {
     min-width: 650px;
 }
 
+#feed-container>.post-container.post-error { text-align:center; padding: 15px; }
+
 .post-container>.post-body,
 .post-container>.post-header { border-bottom: 1px solid #ccc; }
 
