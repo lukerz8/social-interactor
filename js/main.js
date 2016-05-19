@@ -16,7 +16,6 @@ var interactor = (function() {
     }
 
     function addToFeed(data){
-
         var post = $("<div/>", {
             'class':'material post-container',
             'id':data.id
@@ -24,15 +23,19 @@ var interactor = (function() {
         var postHeader  = $('<div/>',{ 'class':'post-header' });
         var postBody    = $('<div/>',{ 'class':'post-body' });
         var postFooter  = $('<div/>',{ 'class':'post-footer' });
-        
-        var avator  = $('<img/>', {
+
+        /******** Post Header Elements ********/
+
+        var avator = $('<img/>', {
             'class':'avator',
             'src':data.actor_avator,
             'alt':data.actor_username + ' avator'
         });
+        
+        var authorCont = $('<div/>', { 'class': 'actor-container' });
 
-        var author  = $('<h2/>', {
-            'class': 'author',
+        var authorName = $('<h2/>', {
+            'class': 'actor-name',
             'text': data.actor_name
         });
 
@@ -42,24 +45,59 @@ var interactor = (function() {
             'target':'_blank',
             'text': '@'+data.actor_username //todo: should the @ always be there?
         });
+        
+        var authorDesc = $('<h3/>', {
+            'class': 'actor-desc',
+            'text': data.actor_description
+        });
 
+        /** Combine Author Elements **/
+        $(authorCont).append(authorName, username, authorDesc);
+
+        var postDate = $('<span/>', {
+            'class': 'post-date',
+            'text': formatPostDate(data.activity_date)
+        });
+
+        var socIcon = $('<span/>', {
+            'class': 'fa fa-' + getSocIconType(data.provider)
+        });
+
+        /** Combine Header Elements **/
+        $(postHeader).append(avator, authorCont, socIcon, postDate);
+
+        /******** Post Body Elements ********/
+
+        // Check for post attachment
         if(data.activity_attachment !== null && data.activity_attachment_type === 'image/jpeg') {
+            var bodyImgCont  = $('<a/>', {
+                'class': 'post-img-container',
+                'href': data.activity_attachment
+            });
+
             var bodyImg = $('<img/>', {
                 'class':'post-img',
-                'src':data.activity_message
-                //,'alt':'?' //todo
+                'src':data.activity_attachment
             });
-            $(postBody).append(bodyImg);
+
+            $(bodyImgCont).append(bodyImg);
+            $(postBody).append(bodyImgCont);
+
+            // just in case there's a message in addition to the attachment...
+            if(data.activity_message.trim() !== data.activity_attachment.trim()) {
+                var bodyTxt = $('<p/>', { 'text':data.activity_message });
+                $(postBody).append(bodyTxt);
+            }
+
         } else {
             $(postBody).text(data.activity_message);
         }
 
-        var socIcon = $('<span/>', {
-            'class': 'socicon socicon-' + getSocIconType(data.provider)
-        });
+        /******** Post Footer Elements ********/
 
-        $(author).append(username);
-        $(postHeader).append(avator, author, socIcon);
+        // todo
+
+        /** Combine and Append Post to Feed Container **/
 
         $(post).append(postHeader, postBody, postFooter);
         $('#feed-container').append(post);
@@ -67,19 +105,25 @@ var interactor = (function() {
 
     function getSocIconType(provider) {
         switch(provider) {
-            case 'facebook':    return 'facebook';  break;
-            case 'instagram':   return 'instagram'; break;
-            case 'reddit':      return 'reddit';    break;
-            case 'tumblr':      return 'tumblr';    break;
-            case 'twitter':     return 'twitter';   break;
+            case 'facebook':    return 'facebook';      break;
+            case 'instagram':   return 'instagram';     break;
+            case 'reddit':      return 'reddit-alien';  break;
+            case 'tumblr':      return 'tumblr';        break;
+            case 'twitter':     return 'twitter';       break;
+            default:            return 'question';
         }
     }
 
-    //function getFeedEl() {  }
+    // Could update this to prettier date later; keeping it simple for now
+    function formatPostDate(dateStr) {
+        var d = new Date(dateStr);
+        return (d.getMonth() + 1) + '/' + d.getDate() + '/' + (d.getFullYear());
+    }
 
     return {
         init: function() {
-            var getReq = $.getJSON(remoteUrl, function(data){
+            //var getReq = $.getJSON(remoteUrl, function(data){
+            $.getJSON(remoteUrl, function(data){
                 if(data.length > 0) {
                     data.forEach(parseDataItem);
                 } else { /* todo: no data received event? */ }
