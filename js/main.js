@@ -99,7 +99,7 @@ var interactor = (function() {
         // Thanks w3Schools for the tool"tip" <http://www.w3schools.com/css/css_tooltip.asp> ;D
 
         var sentiment = $('<span/>', {
-            'class': 'activity-icon tooltip fa fa-' + getSentimentType(data.activity_sentiment),
+            'class': 'activity-icon icon-sentiment tooltip fa fa-' + getSentimentType(data.activity_sentiment),
             'html': '<span class="material tooltiptext tooltip-bottom">Sentiment</span>'
         });
 
