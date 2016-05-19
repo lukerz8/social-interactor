@@ -9,19 +9,21 @@ var interactor = (function() {
     var feedData = {};
 
     function parseDataItem(data) {
+        // todo: sort data by date, most recent first
+        // <http://gabrieleromanato.name/jquery-sorting-json-objects-in-ajax/>
         feedData[data.id] = data;
         addToFeed(data);
     }
 
     function addToFeed(data){
 
-        var post = $("<li/>", {
-            'class':'list-group-item post-container',
+        var post = $("<div/>", {
+            'class':'material post-container',
             'id':data.id
         });
-        var header  = $('<div/>',{ 'class':'post-header' });
-        var body    = $('<div/>',{ 'class':'post-body' });
-        var footer  = $('<div/>',{ 'class':'post-footer' });
+        var postHeader  = $('<div/>',{ 'class':'post-header' });
+        var postBody    = $('<div/>',{ 'class':'post-body' });
+        var postFooter  = $('<div/>',{ 'class':'post-footer' });
         
         var avator  = $('<img/>', {
             'class':'avator',
@@ -29,32 +31,48 @@ var interactor = (function() {
             'alt':data.actor_username + ' avator'
         });
 
-        var author  = $('<h3/>', {
+        var author  = $('<h2/>', {
             'class': 'author',
             'text': data.actor_name
         });
 
-        var username = $('<small/>', {
-            'text': ' @'+data.actor_username //todo: should the @ always be there?
+        var username = $('<a/>', {
+            'class': 'actor-username',
+            'href': data.actor_url,
+            'target':'_blank',
+            'text': '@'+data.actor_username //todo: should the @ always be there?
         });
 
         if(data.activity_attachment !== null && data.activity_attachment_type === 'image/jpeg') {
             var bodyImg = $('<img/>', {
-                'class':'body-img',
+                'class':'post-img',
                 'src':data.activity_message
-                //,'alt':'?'
+                //,'alt':'?' //todo
             });
-            $(body).append(bodyImg);
+            $(postBody).append(bodyImg);
         } else {
-            $(body).text(data.activity_message);
+            $(postBody).text(data.activity_message);
         }
 
+        var socIcon = $('<span/>', {
+            'class': 'socicon socicon-' + getSocIconType(data.provider)
+        });
 
         $(author).append(username);
-        $(header).append(avator, author);
+        $(postHeader).append(avator, author, socIcon);
 
-        $(post).append(header, body, footer);
+        $(post).append(postHeader, postBody, postFooter);
         $('#feed-container').append(post);
+    }
+
+    function getSocIconType(provider) {
+        switch(provider) {
+            case 'facebook':    return 'facebook';  break;
+            case 'instagram':   return 'instagram'; break;
+            case 'reddit':      return 'reddit';    break;
+            case 'tumblr':      return 'tumblr';    break;
+            case 'twitter':     return 'twitter';   break;
+        }
     }
 
     //function getFeedEl() {  }

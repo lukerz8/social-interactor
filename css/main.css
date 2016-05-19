@@ -1,43 +1,116 @@
-html{ height: 100%; }
-body {
+html, body {
     height: 100%;
-    background: #222;
+    overflow: hidden;
+    font-family: 'Lato', sans-serif;
 }
 
-#main-container,
-#main-container>.row{
-    height: 100%;
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-button { display:none; }
+::-webkit-scrollbar-track { background: #EDE9E6; }
+::-webkit-scrollbar-thumb { background: #918C88; }
+::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-track {
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
 }
 
-#main-container {
-
+/* thanks to <https://codepen.io/sdthornton/pen/wBZdXq> for material design styling */
+.material {
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+    -webkit-box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    -moz-box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
+
+.socicon-facebook   { background-color: #3e5b98; }
+.socicon-instagram  { background-color: #000000; }
+.socicon-reddit     { background-color: #e74a1e; }
+.socicon-tumblr     { background-color: #45556c; }
+.socicon-twitter    { background-color: #4da7de; }
+
+#main-container { height: 100%; }
 
 #feed-container {
-    border: 1px solid #ccc;
-    max-height:90%;
+    margin: 15px auto;
+    max-height:85%;
     overflow-y:scroll;
+    border: 1px solid #FFFFFE;
+    background: #e2e1e0;
+    max-width: 800px;
 }
-#feed-container>.post-container>.post-body,
-#feed-container>.post-container .post-header {
+
+#feed-container>.post-container {
+    background: #fff;
+    margin: 24px 30px;
+}
+
+.post-container>.post-body,
+.post-container>.post-header {
     border-bottom: 1px solid #ccc;
 }
 
-#feed-container>.post-container .post-header > * {
+.post-container>.post-header>* {
     display:inline-block;
-
-}
-
-#feed-container>.post-container .post-header > .author {
     text-align:left;
 }
 
-#feed-container>.post-container .post-header img.avator {
-    height: auto;
-    max-width: 64px;
-    margin-right: 15px;
+.post-header>.author>.actor-username,
+.post-header>.author>.actor-username:visited {
+    font-size: 0.8em;
+    color: #888;
+    padding-left: 10px;
+    text-decoration:none;
+}
+.post-header>.author>.actor-username:hover,
+.post-header>.author>.actor-username:active {
+    text-decoration:underline;
+
 }
 
-#feed-container>.post-container>.post-body {
-    padding: 10px 15px;
+.post-header img.avator {
+    height: auto;
+    max-width: 64px;
+    margin: 10px 15px 0 10px;
+    padding: 5px 0 0 5px;
+    border: 1px solid #dedede;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
 }
+
+.post-container>.post-body {
+    padding: 30px 15px 15px 15px;
+    min-height: 100px;
+}
+
+.post-container>.post-body>.post-img {
+    margin: 10px 15px;
+    max-width: 200px;
+    height: auto;
+    display: block;
+}
+
+.post-container>.post-header>.socicon {
+    float: right;
+    margin: 10px 10px 0 0;
+    height: 36px;
+    width: 36px;
+    padding: 10px;
+    font-size: 2em;
+    color: #fff;
+    text-align: center;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+}
+
+@media(min-width: 550px) {  }
+
+@media(min-width: 768px) {  }
+
+@media(min-width: 992px) {  }
+
+@media(min-width: 1200px) {  }
