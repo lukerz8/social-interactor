@@ -8,11 +8,18 @@ var interactor = (function() {
 
     var feedData = {};
 
-    function parseDataItem(data) {
+    function parseData(data) {
         // todo: sort data by date, most recent first
-        // <http://gabrieleromanato.name/jquery-sorting-json-objects-in-ajax/>
+        /*
+        I'm just going to use JS promises, because:
+         1. Desktop browser support is very good - <http://caniuse.com/#feat=promises>
+         2. for the love of god stop using IE...
+
+         Help from here: <https://davidwalsh.name/write-javascript-promises>
+         */
+
         feedData[data.id] = data;
-        addToFeed(data);
+        //addToFeed(data);
     }
 
     function addToFeed(data){
@@ -173,25 +180,42 @@ var interactor = (function() {
         return (d.getMonth() + 1) + '/' + d.getDate() + '/' + (d.getFullYear());
     }
 
-    return {
-        init: function() {
-            //var getReq = $.getJSON(remoteUrl, function(data){
-            $.getJSON(remoteUrl, function(data){
-                if(data.length > 0) {
-                    data.forEach(parseDataItem);
-                } else { msgNoData("There are no posts"); }
+    function sortRawData(data, prop, direction) {
+        return data.sort(function(a, b){
+            if(a[prop] == b[prop]){ return 0; }
+            else { return a[prop] < b[prop] ? -1 * direction : 1 * direction; }
+        });
+    }
 
+    return {
+        getData: function() {
+            return $.getJSON(remoteUrl)
+            .fail(function() {
+                msgNoData("Request Failed");
+                return -1;
             })
-              .done(function(){
-                  // todo?
-              })
-              .fail(function(){ msgNoData("Request Failed"); });
+            .then(function(data) {
+                if(data.length > 0) {
+                    return sortRawData(data, 'activity_date', 1);
+                } else {
+                    msgNoData("There are no posts");
+                    return -1;
+                }
+            });
         },
-        getFeedData: function() {
-            return feedData; // todo: does this need to check to make sure the data has been retrieved first?
+        init: function() {
+            this.getData().done(function(data){
+                if(data !== -1 && data.length > 0) {
+                    feedData = data;
+                    data.forEach(addToFeed);
+                } else {
+                    // Shouldn't get here (famous last words...)
+                    msgNoData();
+                }
+            });
         }
     };
-
-
 })();
+
+// May need to use this for sorting later - <http://stackoverflow.com/a/4698083/5121100>
 
