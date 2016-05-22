@@ -1,4 +1,9 @@
 $(function(){
+    /*
+    $.when(interactor.init()).done(function(){
+        console.log("testing done");
+    });
+    */
     interactor.init();
 });
 
@@ -8,18 +13,67 @@ var interactor = (function() {
 
     var feedData = {};
 
-    function parseData(data) {
-        // todo: sort data by date, most recent first
+    function getRawData() {
         /*
-        I'm just going to use JS promises, because:
+         I'm just going to use JS promises, because:
          1. Desktop browser support is very good - <http://caniuse.com/#feat=promises>
          2. for the love of god stop using IE...
 
          Help from here: <https://davidwalsh.name/write-javascript-promises>
          */
+        return $.getJSON(remoteUrl)
+            .fail(function() {
+                msgNoData("Request Failed");
+                return -1;
+            })
+            .then(function(data) {
+                if(data.length > 0) {
+                    return sortData(data, 'activity_date', -1);
+                } else {
+                    msgNoData("There are no posts");
+                    return -1;
+                }
+            });
+    }
 
-        feedData[data.id] = data;
-        //addToFeed(data);
+    function sortData(data, prop, direction) {
+        return data.sort(function(a, b){
+            var item1; var item2;
+
+            switch(prop) {
+                case "activity_date":
+                    item1 = Date.parse(a[prop]);
+                    item2 = Date.parse(b[prop]);
+                    break;
+                case "id":
+                    item1 = parseInt(a[prop]);
+                    item2 = parseInt(b[prop]);
+                    break;
+                default:
+                    item1 = a[prop];
+                    item2 = b[prop];
+            }
+
+            if(typeof item1 === 'string' && typeof item2 === 'string') {
+                item1 = item1.toLowerCase();
+                item2 = item2.toLowerCase();
+            }
+
+            if(item1 == item2){ return 0; }
+            else { return item1 < item2 ? -1 * direction : 1 * direction; }
+        });
+    }
+
+    // if the data source is down or no data is received...
+    function msgNoData(errMsg) {
+        if(errMsg.length == 0) { errMsg = "Unknown Error"; }
+
+        var post = $("<div/>", {
+            'class':'material post-container post-error',
+            'html':"<h3>No Data Received: " + errMsg + "</h3>"
+        });
+
+        $('#feed-container').append(post);
     }
 
     function addToFeed(data){
@@ -38,7 +92,7 @@ var interactor = (function() {
             'src':data.actor_avator,
             'alt':data.actor_username + ' avator'
         });
-        
+
         var authorCont = $('<div/>', { 'class': 'actor-container' });
 
         var authorName = $('<h2/>', {
@@ -52,7 +106,7 @@ var interactor = (function() {
             'target':'_blank',
             'text': '@'+data.actor_username //todo: should the @ always be there?
         });
-        
+
         var authorDesc = $('<h3/>', {
             'class': 'actor-desc',
             'text': data.actor_description
@@ -112,7 +166,7 @@ var interactor = (function() {
 
         var likes = $('<span/>', {
             'class': 'activity-icon tooltip fa fa-thumbs-o-up',
-            'html': '&nbsp;' + data.activity_likes + 
+            'html': '&nbsp;' + data.activity_likes +
                 '<span class="material tooltiptext tooltip-bottom">Likes</span>'
         });
 
@@ -161,50 +215,15 @@ var interactor = (function() {
         else                    { return 'meh-o'; }
     }
 
-    // if the data source is down or no data is received...
-    function msgNoData(errMsg) {
-        if(errMsg.length == 0) { errMsg = "Unknown Error"; }
-
-        var post = $("<div/>", {
-            'class':'material post-container post-error',
-            'html':"<h3>No Data Received: " + errMsg + "</h3>"
-        });
-
-
-        $('#feed-container').append(post);
-    }
-
     // Could update this to prettier date later; keeping it simple for now
     function formatPostDate(dateStr) {
         var d = new Date(dateStr);
         return (d.getMonth() + 1) + '/' + d.getDate() + '/' + (d.getFullYear());
     }
 
-    function sortRawData(data, prop, direction) {
-        return data.sort(function(a, b){
-            if(a[prop] == b[prop]){ return 0; }
-            else { return a[prop] < b[prop] ? -1 * direction : 1 * direction; }
-        });
-    }
-
     return {
-        getData: function() {
-            return $.getJSON(remoteUrl)
-            .fail(function() {
-                msgNoData("Request Failed");
-                return -1;
-            })
-            .then(function(data) {
-                if(data.length > 0) {
-                    return sortRawData(data, 'activity_date', 1);
-                } else {
-                    msgNoData("There are no posts");
-                    return -1;
-                }
-            });
-        },
         init: function() {
-            this.getData().done(function(data){
+            getRawData().done(function(data){
                 if(data !== -1 && data.length > 0) {
                     feedData = data;
                     data.forEach(addToFeed);
@@ -217,5 +236,8 @@ var interactor = (function() {
     };
 })();
 
-// May need to use this for sorting later - <http://stackoverflow.com/a/4698083/5121100>
-
+var interactorChartHelper = (function(){
+    return {
+        
+    };
+})();
