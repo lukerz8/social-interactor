@@ -1,4 +1,7 @@
 html, body {
+    position:fixed;
+    top:0;
+    left:0;
     height: 100%;
     overflow: hidden;
     font-family: 'Lato', sans-serif;
@@ -39,17 +42,35 @@ html, body {
 
 .tooltip .tooltiptext {
     font-family: 'Lato', sans-serif;
-    background-color: black;
+    background: #000;
     color: #fff;
     text-align: center;
     padding: 5px 15px;
-    position: absolute;
-    z-index: 1;
+    z-index: 10;
     opacity: 0;
+    position: absolute;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
     -webkit-transition:  opacity 400ms ease-in-out;
     -moz-transition-property: opacity 400ms ease-in-out;
     -o-transition-property: opacity 400ms ease-in-out;
     transition: opacity 400ms ease-in-out;
+}
+
+.d3tooltip {
+    font-family: 'Lato', sans-serif;
+    background: #000;
+    color: #fff;
+    text-align: center;
+    display: none;
+    font-size: 12px;
+    left: 36%;
+    padding: 10px;
+    position: relative;
+    top: -260px;
+    width: 80px;
+    z-index: 10;
 }
 
 .tooltip:hover .tooltiptext { opacity: 1; }
@@ -72,18 +93,34 @@ html, body {
 }
 */
 
-#main-container { height: 100%; }
+#main-container {
+    height: 100%;
+    /*width: 1200px;
+    margin: 0 auto;*/
+}
 
 #feed-control { margin-top: 15px; }
 
+#data-container,
 #feed-container {
-    margin: 0 auto 15px auto;
-    max-height:85%;
+    margin: 2% 15px;
+    height:96%;
     overflow-y:scroll;
     border: 1px solid #e2e1e0;
     background: #e2e1e0;
+
+}
+
+#data-container {
+    float:right;
+    max-width: 400px;
+}
+
+#feed-container {
+    float:left;
     max-width: 800px;
 }
+
 
 #feed-container>.post-container {
     background: #fff;
@@ -208,10 +245,18 @@ html, body {
 
 
 
-@media(min-width: 550px) {  }
+@media(min-width: 550px) {
 
-@media(min-width: 768px) {  }
+}
 
-@media(min-width: 992px) {  }
+@media(min-width: 768px) {
 
-@media(min-width: 1200px) {  }
+}
+
+@media(min-width: 992px) {
+
+}
+
+@media(min-width: 1200px) {
+
+}

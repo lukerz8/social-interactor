@@ -8,8 +8,8 @@ $(function(){
 });
 
 var interactor = (function() {
-    //var remoteUrl = '//nuvi-challenge.herokuapp.com/activities';
-    var remoteUrl = 'data/test-01.json';
+    var remoteUrl = '//nuvi-challenge.herokuapp.com/activities';
+    //var remoteUrl = 'data/test-01.json';
 
     var feedData = {};
 
@@ -161,32 +161,32 @@ var interactor = (function() {
 
         var sentiment = $('<span/>', {
             'class': 'activity-icon icon-sentiment tooltip fa fa-' + getSentimentType(data.activity_sentiment),
-            'html': '<span class="material tooltiptext tooltip-bottom">Sentiment</span>'
+            'html': '<span class="tooltiptext tooltip-bottom">Sentiment</span>'
         });
 
         var likes = $('<span/>', {
             'class': 'activity-icon tooltip fa fa-thumbs-o-up',
             'html': '&nbsp;' + data.activity_likes +
-                '<span class="material tooltiptext tooltip-bottom">Likes</span>'
+                '<span class="tooltiptext tooltip-bottom">Likes</span>'
         });
 
         var shares = $('<span/>', {
             'class': 'activity-icon tooltip fa fa-retweet',
             'html': '&nbsp;' + data.activity_shares +
-                '<span class="material tooltiptext tooltip-bottom">Shares</span>'
+                '<span class="tooltiptext tooltip-bottom">Shares</span>'
         });
 
         var comments = $('<span/>', {
             'class': 'activity-icon tooltip fa fa-comment-o',
             'html': '&nbsp;' + data.activity_comments +
-            '<span class="material tooltiptext tooltip-bottom">Comments</span>'
+            '<span class="tooltiptext tooltip-bottom">Comments</span>'
         });
 
         var url = $('<a/>', {
             'class': 'activity-icon tooltip fa fa-external-link',
             'href': data.activity_url,
             'target': '_blank',
-            'html': '<span class="material tooltiptext tooltip-bottom">View Post</span>'
+            'html': '<span class="tooltiptext tooltip-bottom">View Post</span>'
 
         });
 
@@ -221,12 +221,49 @@ var interactor = (function() {
         return (d.getMonth() + 1) + '/' + d.getDate() + '/' + (d.getFullYear());
     }
 
+    function getSourceData() {
+        var ret = [
+            { label: 'Facebook',    count: 0, color: '#3e5b98' },
+            { label: 'Instagram',   count: 0, color: '#000000' },
+            { label: 'Reddit',      count: 0, color: '#e74a1e' },
+            { label: 'Tumblr',      count: 0, color: '#45556c' },
+            { label: 'Twitter',     count: 0, color: '#4da7de' },
+            { label: 'Other',       count: 0, color: '#808080' }
+        ];
+
+        feedData.forEach(function(element){
+            switch(element.provider) {
+                case 'facebook':    ret[0].count++; break;
+                case 'instagram':   ret[1].count++; break;
+                case 'reddit':      ret[2].count++; break;
+                case 'tumblr':      ret[3].count++; break;
+                case 'twitter':     ret[4].count++; break;
+                default:            ret[5].count++;
+            }
+        });
+
+        // filter out media sources with a count of 0 and return data
+        return ret.filter(function(element) { return element.count !== 0; });
+    }
+
+    function addDataCharts() {
+        var postSourceData = getSourceData();
+
+        addChartItem(postSourceData);
+    }
+    
+    function addChartItem(dataset) {
+        interactorChartHelper.appendDonutChart(dataset);
+    }
+
     return {
         init: function() {
             getRawData().done(function(data){
                 if(data !== -1 && data.length > 0) {
                     feedData = data;
-                    data.forEach(addToFeed);
+                    $.when(data.forEach(addToFeed)).done(function(){
+                        addDataCharts();
+                    });
                 } else {
                     // Shouldn't get here (famous last words...)
                     msgNoData();
@@ -236,8 +273,108 @@ var interactor = (function() {
     };
 })();
 
+// This is based on my experiment here: <http://codepen.io/bluesaltlabs/pen/oxKjLG>,
+// which was completely derived from here: <http://zeroviscosity.com/d3-js-step-by-step/step-1-a-basic-pie-chart>
 var interactorChartHelper = (function(){
+    var width = 360;
+    var height = 360;
+    var radius = Math.min(width, height) / 2;
+    var donutWidth = 75;
+    var legendRectSize = 18;
+    var legendSpacing = 4;
+
+    function getColors(dataArr) {
+        if(dataArr.length > 0) {
+            var colorsArr = [];
+            dataArr.forEach(function(el){ colorsArr.push(el.color); });
+
+            return d3.scale.ordinal().range(colorsArr);
+        } else {
+            return d3.scale.category20b();
+        }
+    }
+
     return {
-        
+        appendDonutChart: function(dataset) {
+            var color = getColors(dataset);
+
+            var svg = d3.select('#data-container')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .append('g')
+                .attr('transform', 'translate(' + (width / 2) +  ',' + (height / 2) + ')');
+
+            var arc = d3.svg.arc()
+                .innerRadius(radius - donutWidth)
+                .outerRadius(radius);
+
+            var pie = d3.layout.pie()
+                .value(function(d) { return d.count; })
+                .sort(null);
+
+            var path = svg.selectAll('path')
+                .data(pie(dataset))
+                .enter()
+                .append('path')
+                .attr('d', arc)
+                .attr('fill', function(d, i) {
+                    return color(d.data.label);
+                })
+                .each(function(d) { this._current = d; });
+
+            path.on('mouseover', function(d) {
+                var total = d3.sum(dataset.map(function(d) {
+                    return d.count;
+                }));
+                var percent = Math.round(1000 * d.data.count / total) / 10;
+                tooltip.select('.label').html(d.data.label);
+                tooltip.select('.count').html(d.data.count);
+                tooltip.select('.percent').html(percent + '%');
+                tooltip.style('display', 'block');
+            });
+
+            path.on('mouseout', function(d) {
+                tooltip.style('display', 'none');
+            });
+            
+            var legend = svg.selectAll('.legend')
+                .data(color.domain())
+                .enter()
+                .append('g')
+                .attr('class', 'legend')
+                .attr('transform', function(d, i) {
+                    var height = legendRectSize + legendSpacing;
+                    var offset =  height * color.domain().length / 2;
+                    var horz = -2 * legendRectSize;
+                    var vert = i * height - offset;
+                    return 'translate(' + horz + ',' + vert + ')';
+                });
+
+            var tooltip = d3.select('#data-container')
+                .append('div')
+                .attr('class', 'd3tooltip');
+
+            tooltip.append('div')
+                .attr('class', 'label');
+
+            tooltip.append('div')
+                .attr('class', 'count');
+
+            tooltip.append('div')
+                .attr('class', 'percent');
+
+
+            legend.append('rect')
+                .attr('width', legendRectSize)
+                .attr('height', legendRectSize)
+                .style('fill', color)
+                .style('stroke', color);
+
+            legend.append('text')
+                .attr('x', legendRectSize + legendSpacing)
+                .attr('y', legendRectSize - legendSpacing)
+                .text(function(d) { return d; });
+        }
     };
 })();
